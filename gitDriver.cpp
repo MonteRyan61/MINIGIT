@@ -37,6 +37,17 @@ int main(int argc, char* argv[])
 
             case 3: {
                 //removing files from the commit
+                bool found = false;
+                string toRemove;
+                cout << "What is the name of the file that you would like to remove from the commit" << endl;
+                do
+                {
+                    string toRemove;
+                    getline(cin, toRemove);
+                    found = mainRepo.removeFile(toRemove); //removeFile will return true if the file name was found and the string name was removed from the list
+                } while (found == false);
+                
+
                 break;
             }
 

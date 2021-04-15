@@ -14,7 +14,7 @@ void git::addFile(string filename)
     }
 }
 
-void git::removeFile(string filename)
+bool git::removeFile(string filename)
 {
     
 }
