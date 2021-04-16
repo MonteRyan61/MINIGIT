@@ -32,6 +32,7 @@ class git
         
         
     private:
+    doublyNode commitHead;
 };
 
 #endif

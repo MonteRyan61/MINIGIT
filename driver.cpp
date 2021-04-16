@@ -41,9 +41,19 @@ int main(int argc, char* argv[])
                 cout << "What is the name of the file that you would like to remove from the commit" << endl;
                 do
                 {
+                    cout << "What is the name of the file that you would like to remove from the commit" << endl;
                     string toRemove;
                     getline(cin, toRemove);
+                    if(toRemove == "quit") //check if they would like to leave the remove option
+                    {
+                        cout << "Leaving the remove nothing will be removed from the repository" << endl;
+                        break;
+                    }
                     found = mainRepo.removeFile(toRemove); //removeFile will return true if the file name was found and the string name was removed from the list
+                    if(found == false)
+                    {
+                        cout << "That file does not exist in the current version of the repository please enter another or type quit if you would like to exit remove" << endl;
+                    }
                 } while (found == false);
                 
 
