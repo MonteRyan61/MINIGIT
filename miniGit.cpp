@@ -40,6 +40,7 @@ bool git::removeFile(string filename)
         }
         prev = curr;
         curr = curr->next;
+        
     }
     //if the loop has exited without returning that means the string name did not match any nodes string name in the SLL so we return false and prompt the user to enter another name
     return false;
