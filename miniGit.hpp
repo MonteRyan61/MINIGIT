@@ -33,6 +33,7 @@ class git
         
     private:
     doublyNode* commitHead;
+    doublyNode* commitTail;
 };
 
 #endif

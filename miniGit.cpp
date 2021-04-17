@@ -51,7 +51,28 @@ void git::commitChanges()
 // cout << headCommit->commitNumber << endl;
 }
 
-void checkout(int _commitNumber)
+void git::checkout(int _commitNumber)
 {
+    doublyNode* curr = commitHead;
+    //first wanna get curr on the node they wanna check out and make sure that that commit number is valid
+    if(_commitNumber < 0) //will have no negative commits
+    {
+        cout << "Invalid commit number to check out with" << endl;
+        return;
+    }
+    while(curr != NULL) //wanna traverse the list and get onto the commit the user would like to check out
+    {   
+        if(curr->commitNumber == _commitNumber)
+        {
+            break;
+        }
+        else
+        {
+            curr = curr->next;
+        }
+    }
+    //now that curr is on the node the user would like to check out we must copy the files over from the repository to the user accesed files
+    //implement a function in which will copy all files to the old string names in the hidden folder to the current directory
+    //maybe use a helper function
 
 }

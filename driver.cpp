@@ -67,6 +67,17 @@ int main(int argc, char* argv[])
 
             case 5: {
                 //check out
+                string choice;
+                int comnum;
+                cout << "Are you sure that you would like to check out a seperate commit you will lose your local changes if you check out a different version before commiting your local changes" << endl;
+                cout << "Enter Y to conitue or N to not" << endl;
+                cin >> choice;
+                if(choice == "Y")
+                {
+                    cout << "Which commit number would you like to check out" << endl;
+                    cin >> comnum;
+                    mainRepo.checkout(comnum);
+                }
                 break;
             }
 
