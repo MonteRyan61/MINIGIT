@@ -53,5 +53,5 @@ void git::commitChanges()
 
 void checkout(int _commitNumber)
 {
-    
+
 }
