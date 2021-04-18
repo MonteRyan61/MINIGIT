@@ -25,8 +25,15 @@ int main(int argc, char* argv[])
 {
     int opt = 0;
     git mainRepo; //establishing the class git
-    
-    while(opt != 5) {
+    int numCommits = 0;
+
+    //initializes a doubly node and the singly node's head point
+    doublyNode* tmp = new doublyNode;
+    tmp->commitNumber = numCommits; //not sure what to do with the commitNumbers
+    singlyNode* head = new singlyNode;
+    tmp->head = head;
+
+    while(opt != 6) {
         menu(); //printing menu
 
         //getting user input
@@ -38,20 +45,14 @@ int main(int argc, char* argv[])
             //intialize directory
             case 1: 
             {
-                mkdir("currDir", 0777); //returns -1 if the dir isn't created
-                doublyNode* headCommit = new doublyNode;
-                headCommit->commitNumber = 0;
+                //creates a new directory
+                mkdir(".minigit", 0777); //returns -1 if the dir isn't created
                 break;
             }
             
             //add files
             case 2: {
-                //prompt user for file name
-                string filename;
-                cout << "Please enter a file name: " << endl;
-                getline(cin, filename);
-
-                mainRepo.addFile(filename);
+                mainRepo.addFile(tmp->head);
                 break;
             }
             
@@ -82,6 +83,7 @@ int main(int argc, char* argv[])
 
             //commit changes
             case 4: {
+                numCommits ++;
                 break;
             }
 

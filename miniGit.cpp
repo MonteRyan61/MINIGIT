@@ -1,17 +1,92 @@
 #include "miniGit.hpp"
 #include <iostream>
 #include <fstream>
+#include <string>
+#include <sstream>
+#include <iomanip>
 
 using namespace std;
-
-void git::addFile(string filename)
+/*
+This function iterates the version type. 
+Variables: 
+    name: name of the file,    
+    check: if 1 then file is created, else the file needs to be created
+*/
+string versionHelper(string name, int check)
 {
-    //Check whether the file with the given name exists in the current directory.  
+    //getting the end of the string .txt, .hpp, or .cpp
+    string end = name.substr(name.length()-4, name.length());
+    name.erase(name.length()-4, name.length());
+    string final;
+
+    if (check == 1)
+    {
+        //getting the iteration of the file
+        string num = name.substr(name.length()-2, name.length());
+        name.erase(name.length()-2, name.length());
+        
+        //increasing the iteration and converting it back to a string
+        int n = stoi(num);
+        n++;
+        stringstream ss;
+        ss << setw(2) << setfill('0') << n;
+        num = ss.str();
+        
+        //putting it all back together
+        final = name + num + end;
+    }
+
+    else
+    {
+        final = name + "00" + end;
+    }
+    return final;
+}
+
+void git::addFile(singlyNode * sll)
+{
+    bool check = false;
+    string filename;
+    do 
+    {
+        //prompt user for file name
+        cout << "Please enter a valid file name: " << endl;
+        getline(cin, filename);
+
+        //Check whether the file with the given name exists in the current directory.
+        if (true)
+        {
+            check = true; //needs to be fixed
+        }
+
+    } while (check == false); //If not, keep prompting the user to enter a valid file name.
     
-    //If not, keep prompting the user to enter a valid file name.
     //Check SLL whether the file has already been added. File with same name can't be added twice
-    //A new SLL node gets added containing: name of input file, name of repository file, and next pointer
-    //The repository file name should be the combination of the original file name and the version number.
+    singlyNode *curr = sll;
+    singlyNode *prev = NULL;
+    while (curr != NULL)
+    {
+        if (filename == curr->fileName)
+        {
+            break;
+        }
+        prev = curr;
+        curr = curr->next;
+    }
+
+    //filename was not found
+    if (curr == NULL)
+    {
+        singlyNode *tmp = new singlyNode;
+        tmp->fileName = filename;
+        tmp->fileVersion = versionHelper(filename, 0); 
+        tmp->next = NULL;
+        prev->next = tmp;
+    }
+    else //filename was found
+    {
+        curr->fileVersion = versionHelper(filename, 1); 
+    }
 }
 
 bool git::removeFile(string filename)
