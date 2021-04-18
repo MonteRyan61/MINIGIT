@@ -60,7 +60,8 @@ return pointerToRecentCommit;
 bool _NotInDirectory(string singlyFileVersion)
 {
     bool NotInDirectory = false;
-    ifstream findMe(".minigit/" + singlyFileVersion);
+    string temp = ".minigit/" + singlyFileVersion;
+    ifstream findMe(temp);
     if(!findMe.is_open())
     {
         cout << "File Version does not exist in .minigit directory." << endl;
@@ -86,6 +87,27 @@ bool git::commitChanges()
             string nowAdding = "temporaryName.txt"; // not always a txt file!
             ifstream addThisFileVersion(temp->fileVersion);
             ofstream nowAddingFileVersion(".minigit/" + temp->fileVersion);
+
+            // string Methis = "holder.txt";
+            // string temp = "test/" + Methis;
+            // ifstream addThisFileVersion(Methis);
+            // ofstream nowAddingFileVersion(temp);
+
+            // char addFileC, nowAddingC;
+
+            // if(!addThisFileVersion.is_open())
+            // {
+            //     cout << "File " << Methis << " failed to open." << endl;
+            //     return 0;
+            // }
+
+            // while(addThisFileVersion.get(addFileC))
+            // {
+            //     nowAddingFileVersion << addFileC;
+            // }
+
+            // addThisFileVersion.close();
+            // nowAddingFileVersion.close();
         }
     }
 // cout << headCommit->commitNumber << endl;
