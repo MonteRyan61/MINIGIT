@@ -46,9 +46,48 @@ bool git::removeFile(string filename)
     return false;
 }
 
+doublyNode* _findMostRecentCommit(doublyNode* &doublyHead) // helper function, always compare to most recent commit
+{
+    doublyNode* pointerToRecentCommit = doublyHead;
+    while(pointerToRecentCommit->next != NULL)
+    {
+        pointerToRecentCommit = pointerToRecentCommit->next;
+    }
+
+return pointerToRecentCommit;
+}
+
+bool _NotInDirectory(string singlyFileVersion)
+{
+    bool NotInDirectory = false;
+    ifstream findMe(".minigit/" + singlyFileVersion);
+    if(!findMe.is_open())
+    {
+        cout << "File Version does not exist in .minigit directory." << endl;
+        NotInDirectory = true;
+    }
+    findMe.close();
+
+return NotInDirectory;
+}
+
 bool git::commitChanges()
 {
     bool isCommitted = false;
+    doublyNode* mostRecentCommit = _findMostRecentCommit(commitHead); // always compare to most recent commit
+    int mostRecentCommitNumber = mostRecentCommit->commitNumber;
+
+    singlyNode* temp = mostRecentCommit->head;
+
+    while(temp != NULL) // traverse through SLL of mostRecentCommit
+    {
+        if(_NotInDirectory(temp->fileVersion) == true) // fileVersion does not currently exist in .minigit directory
+        {
+            string nowAdding = "temporaryName.txt"; // not always a txt file!
+            ifstream addThisFileVersion(temp->fileVersion);
+            ofstream nowAddingFileVersion(".minigit/" + temp->fileVersion);
+        }
+    }
 // cout << headCommit->commitNumber << endl;
 
 return isCommitted;

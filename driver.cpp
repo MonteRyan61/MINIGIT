@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
             case 1:
             {
               //inialize directory 
-              mkdir("hey.txt", 0777); //returns -1 if the dir isn't created
+              mkdir(".minigit", 0777); //returns -1 if the dir isn't created
               doublyNode* headCommit = new doublyNode;
               headCommit->commitNumber = 0;
             }
