@@ -46,9 +46,12 @@ bool git::removeFile(string filename)
     return false;
 }
 
-void git::commitChanges()
+bool git::commitChanges()
 {
+    bool isCommitted = false;
 // cout << headCommit->commitNumber << endl;
+
+return isCommitted;
 }
 
 void checkout(int _commitNumber)
