@@ -10,35 +10,56 @@
 
 using namespace std;
 
+void menu()
+{
+    cout << "---- MENU ----" << endl;
+    cout << "1. Create directory" << endl;
+    cout << "2. Add files to the current commit" << endl;
+    cout << "3. Remove files from the current commit" << endl;
+    cout << "4. Commit the changes" << endl;
+    cout << "5. Check out a specific version based on a unique commit number" << endl;
+    cout << "6. Quit" << endl;
+}
+
 int main(int argc, char* argv[])
 {
     int opt = 0;
-    git mainRepo;
-
+    git mainRepo; //establishing the class git
+    
     while(opt != 5) {
+        menu(); //printing menu
+
+        //getting user input
         string s;
         getline(cin, s);
         opt = stoi(s);
-
+        
         switch(opt) {
-            case 1:
+            //intialize directory
+            case 1: 
             {
-              //inialize directory 
-              mkdir("hey.txt", 0777); //returns -1 if the dir isn't created
-              doublyNode* headCommit = new doublyNode;
-              headCommit->commitNumber = 0;
-            }
-            case 2: {
-                //add files
-                
+                mkdir("currDir", 0777); //returns -1 if the dir isn't created
+                doublyNode* headCommit = new doublyNode;
+                headCommit->commitNumber = 0;
                 break;
             }
+            
+            //add files
+            case 2: {
+                //prompt user for file name
+                string filename;
+                cout << "Please enter a file name: " << endl;
+                getline(cin, filename);
 
+                mainRepo.addFile(filename);
+                break;
+            }
+            
+            //removing files from the commit        
             case 3: {
-                //removing files from the commit
                 bool found = false;
                 string toRemove;
-                cout << "What is the name of the file that you would like to remove from the commit" << endl;
+                //cout << "What is the name of the file that you would like to remove from the commit" << endl;
                 do
                 {
                     cout << "What is the name of the file that you would like to remove from the commit" << endl;
@@ -46,36 +67,39 @@ int main(int argc, char* argv[])
                     getline(cin, toRemove);
                     if(toRemove == "quit") //check if they would like to leave the remove option
                     {
-                        cout << "Leaving the remove nothing will be removed from the repository" << endl;
+                        cout << "Leaving the remove. Nothing will be removed from the repository" << endl;
                         break;
                     }
                     found = mainRepo.removeFile(toRemove); //removeFile will return true if the file name was found and the string name was removed from the list
                     if(found == false)
                     {
-                        cout << "That file does not exist in the current version of the repository please enter another or type quit if you would like to exit remove" << endl;
+                        cout << "That file does not exist in the current version of the repository, "
+                            << "please enter another or type quit if you would like to exit remove" << endl;
                     }
                 } while (found == false);
-                
-
                 break;
             }
 
+            //commit changes
             case 4: {
-                //commit changes
                 break;
             }
 
+            //check out
             case 5: {
-                //check out
                 string choice;
                 int comnum;
-                cout << "Are you sure that you would like to check out a seperate commit you will lose your local changes if you check out a different version before commiting your local changes" << endl;
-                cout << "Enter Y to conitue or N to not" << endl;
-                cin >> choice;
+                cout << "Are you sure that you would like to check out a seperate commit?"
+                    " You will lose your local changes if you check out a different version before commiting your local changes" << endl;
+                cout << "Enter Y to continue and N to not" << endl;
+                getline(cin,choice);
                 if(choice == "Y")
                 {
                     cout << "Which commit number would you like to check out" << endl;
-                    cin >> comnum;
+                    string x;
+                    getline(cin, x);
+                    comnum = stoi(x);
+
                     mainRepo.checkout(comnum);
                 }
                 break;
@@ -89,9 +113,7 @@ int main(int argc, char* argv[])
 
         }
     }
-
     cout << "Goodbye!" << endl;
-
     return 0;
 }
 

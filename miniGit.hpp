@@ -8,8 +8,8 @@ using namespace std;
 
 struct singlyNode
 {
-    string fileName;   // Name of local file
-    string fileVersion; // Name of file in .minigit foldersinglyNode * next;
+    string fileName;   // Name of local file, input file name
+    string fileVersion; // Name of file in .minigit foldersinglyNode * next; repository name
     singlyNode * next = NULL;
 };
 

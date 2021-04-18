@@ -6,12 +6,12 @@ using namespace std;
 
 void git::addFile(string filename)
 {
-    ifstream inFile;
-    inFile.open(filename);
-    //if (inFile.error()) //if it doesn't open
-    {
-        cout << "file failed to open" << endl;
-    }
+    //Check whether the file with the given name exists in the current directory.  
+    
+    //If not, keep prompting the user to enter a valid file name.
+    //Check SLL whether the file has already been added. File with same name can't be added twice
+    //A new SLL node gets added containing: name of input file, name of repository file, and next pointer
+    //The repository file name should be the combination of the original file name and the version number.
 }
 
 bool git::removeFile(string filename)
