@@ -14,7 +14,15 @@ using namespace std;
 int main(int argc, char* argv[])
 {
     int opt = 0;
-    git mainRepo;
+    git mainRepo; //establishing the class git
+    int numCommits = 0;
+
+    //initializes a doubly node and the singly node's head point
+    doublyNode* tmp = new doublyNode;
+    tmp->commitNumber = numCommits; //not sure what to do with the commitNumbers
+    singlyNode* head = new singlyNode;
+    tmp->head = head;
+
 
     while(opt != 5) {
         string s;
@@ -31,7 +39,7 @@ int main(int argc, char* argv[])
             }
             case 2: {
                 //add files
-                
+                mainRepo.addFile(tmp->head);
                 break;
             }
 
@@ -88,7 +96,7 @@ int main(int argc, char* argv[])
                     if(answer == "yes") // if user would like to commit
                     {
                         acceptableAnswer = true;
-                        commitSuccess = mainRepo.commitChanges(); // call upon commit function
+                        commitSuccess = mainRepo.commitChanges(tmp->head); // call upon commit function
 
                         if(commitSuccess == true) // if commit was successful
                         {
