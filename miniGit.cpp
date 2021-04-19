@@ -89,6 +89,7 @@ void git::addFile(singlyNode * sll)
     }
 }
 
+
 bool git::removeFile(string filename)
 {
     //first must check if the file name exists in the singly linked list
@@ -121,9 +122,174 @@ bool git::removeFile(string filename)
     return false;
 }
 
-void git::commitChanges()
+
+
+
+
+
+
+
+doublyNode* _findMostRecentCommit(doublyNode* &doublyHead) // helper function, always compare to most recent commit
 {
+    doublyNode* pointerToRecentCommit = doublyHead;
+    while(pointerToRecentCommit->next != NULL)
+    {
+        pointerToRecentCommit = pointerToRecentCommit->next;
+    }
+
+return pointerToRecentCommit; // return a pointer to the most recent commit
+}
+
+
+bool _NotInDirectory(string &singlyFileVersion) // helper function, checks if file version exists in .minigit directory or not
+{
+    bool NotInDirectory = false;
+    string temp = ".minigit/" + singlyFileVersion;
+    ifstream findMe(temp);
+    if(!findMe.is_open()) // if file version doesn't open in .minigit directory, then file version doesn't exist
+    {
+        cout << "File version " << singlyFileVersion << " does not exist in .minigit directory." << endl;
+        NotInDirectory = true;
+    }
+    findMe.close();
+
+return NotInDirectory;
+}
+
+
+void _copyFiles(string fileVersion, int increment) // helper function to copy files into .minigit directory
+{
+    string addThis = fileVersion; // not always a txt file!
+
+    if(increment == 1) // file version is different
+    {
+        addThis = versionHelper(fileVersion, 1); // called upon helper function that increments version
+    }
+
+    string nowAdding = ".minigit/" + addThis;
+    ifstream addThisFileVersion(addThis);
+    ofstream nowAddingFileVersion(nowAdding);
+
+    char addThisFileC;
+
+    if(!addThisFileVersion.is_open())
+    {
+        cout << "File " << addThis << " to be read failed to open." << endl;
+        return;
+    }
+
+    if(!nowAddingFileVersion.is_open())
+    {
+        cout << "File " << nowAdding << " to write into failed to open." << endl;
+        return;
+    }
+
+    while(addThisFileVersion.get(addThisFileC)) // copying to .minigit directory
+    {
+        nowAddingFileVersion << addThisFileC;
+    }
+
+    addThisFileVersion.close();
+    nowAddingFileVersion.close();
+}
+
+
+bool git::commitChanges(singlyNode* _sll) // pass in pointer to head of temporary singly list
+{
+    bool isCommitted = false;
+    doublyNode* mostRecentCommit = _findMostRecentCommit(commitHead); // always compare to most recent commit
+    int mostRecentCommitNumber = mostRecentCommit->commitNumber; // get most recent commit number
+
+    singlyNode* tempSinglyList = _sll; // traverse through temporary SLL (with nodes that are to be added/have been modified)
+    singlyNode* tempSinglyRecentCommit = mostRecentCommit->head; // traverse through most recent commit's SLL
+
+
+    while(_sll != NULL) // traverse through temporary SLL
+    {
+        if(_NotInDirectory(_sll->fileVersion) == true) // if file version does not currently exist in .minigit directory
+        {
+            _copyFiles(_sll->fileVersion, 0); // call upon helper function, pass in a 0 means that file version won't be incremented
+        }
+
+        if(_NotInDirectory(_sll->fileVersion) == false) // file version does currently exist in .minigit directory
+        {
+            bool isChanged = false;
+
+            string currentVersion = _sll->fileVersion; // not always a txt file!
+            string gitVersion = ".minigit/" + currentVersion;
+            ifstream CurrentFileVersion(_sll->fileVersion);
+            ifstream gitFileVersion(gitVersion);
+
+            char CurrentFileVersionC, gitFileVersionC;
+
+            if(!CurrentFileVersion.is_open())
+            {
+                cout << "File " << currentVersion << " to be read failed to open." << endl;
+                break;
+            }
+
+            if(!gitFileVersion.is_open())
+            {
+                cout << "File " << gitVersion << " to write into failed to open." << endl;
+                break;
+            }
+
+            while(1) // read from both files, check if files are the same or not
+            {
+                CurrentFileVersionC = CurrentFileVersion.get();
+                gitFileVersionC = gitFileVersion.get();
+
+                if(CurrentFileVersionC != gitFileVersionC)
+                {
+                    cout << "Files are different." << endl;
+                    isChanged = true;
+                    break;
+                }
+
+                if(CurrentFileVersionC == EOF)
+                {
+                    break;
+                }
+            }
+
+            if(isChanged == true) // if file versions are different
+            {
+                _copyFiles(_sll->fileVersion, 1); // call upon helper function, pass in a 1, which means that version will be incremented
+            }
+
+            cout << "Files are the same." << endl;
+        }
+        _sll = _sll->next;
+    }
+
+    doublyNode * newCommit = new doublyNode; // create new doublyNode
+    newCommit->commitNumber = mostRecentCommit->commitNumber + 1;
+    newCommit->previous = mostRecentCommit;
+    mostRecentCommit->next = newCommit;
+    // newCommit->next = NULL; given in the .hpp file
+
+    // special case for very first commit?
+
+    singlyNode* currSinglyNewCommit = newCommit->head; // pointer to traverse through new commit's SLL
+
+    while(tempSinglyRecentCommit != NULL) // copying most recent commit's SLL to new commit's SLL
+    {
+        singlyNode* SinglyNodeNewCommit = new singlyNode; // create new singly node to be added to new commit
+        SinglyNodeNewCommit->fileName = tempSinglyRecentCommit->fileName;
+        SinglyNodeNewCommit->fileVersion = tempSinglyRecentCommit->fileVersion;
+
+        currSinglyNewCommit = SinglyNodeNewCommit;
+
+        tempSinglyRecentCommit = tempSinglyRecentCommit->next;
+        currSinglyNewCommit = currSinglyNewCommit->next;
+    }
+
+
+
+            // add new singly node, with version number that didn't previously exist, to end of newCommit SLL
 // cout << headCommit->commitNumber << endl;
+
+return isCommitted;
 }
 
 void git::checkout(int _commitNumber)
