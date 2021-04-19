@@ -50,12 +50,6 @@ int main(int argc, char* argv[])
         }
     }
 
-    //initializes a doubly node and the singly node's head point
-    doublyNode* tmp = new doublyNode;
-    tmp->commitNumber = numCommits; //not sure what to do with the commitNumbers
-    singlyNode* head = new singlyNode;
-    tmp->head = head;
-
     while(opt != 5) {
         menu(); //printing menu
 
@@ -68,7 +62,7 @@ int main(int argc, char* argv[])
             //add files
             case 1: {
                 //add files
-                mainRepo.addFile(tmp->head);
+                mainRepo.addFile();
                 break;
             }
             //removing files from the commit        
@@ -86,7 +80,7 @@ int main(int argc, char* argv[])
                         cout << "Leaving the remove. Nothing will be removed from the repository" << endl;
                         break;
                     }
-                    found = mainRepo.removeFile(toRemove, tmp); //removeFile will return true if the file name was found and the string name was removed from the list
+                    found = mainRepo.removeFile(toRemove); //removeFile will return true if the file name was found and the string name was removed from the list
                     if(found == false)
                     {
                         cout << "That file does not exist in the current version of the repository, "
@@ -124,7 +118,7 @@ int main(int argc, char* argv[])
                     if(answer == "yes") // if user would like to commit
                     {
                         acceptableAnswer = true;
-                        commitSuccess = mainRepo.commitChanges(tmp->head); // call upon commit function
+                        commitSuccess = mainRepo.commitChanges(); // call upon commit function
 
                         if(commitSuccess == true) // if commit was successful
                         {

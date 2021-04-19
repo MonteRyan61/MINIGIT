@@ -45,7 +45,7 @@ string versionHelper(string name, int check)
     return final;
 }
 
-void git::addFile(singlyNode * sll)
+void git::addFile()
 {
     bool check = false;
     string filename;
@@ -61,11 +61,21 @@ void git::addFile(singlyNode * sll)
             check = true; //needs to be fixed
         }
 
-    } while (check == false); //If not, keep prompting the user to enter a valid file name.
-    
-    //Check SLL whether the file has already been added. File with same name can't be added twice
-    singlyNode *curr = sll;
+    } while (check == false); //If not, keep prompting the user to enter a valid file name
+    //Check current commit to see whether the file has already been added. File with same name can't be added twice
+    singlyNode *curr = currCommit->head;
     singlyNode *prev = NULL;
+    if(currCommit->head == NULL) //need to add this file to the head of the current commit
+    {
+        cout << "ADD HEAD" << endl;
+        singlyNode *add = new singlyNode;
+        add->fileName = filename;
+        add->fileVersion = versionHelper(filename, 0); 
+        add->next = NULL;
+        currCommit->head = add; //update the head pointer in curr to add
+        return;
+    }
+    //if it the singly in the currCommit was not empty must make sure file with that name doesn't exist already and if it doesn't then go ahead and add if it does print that.
     while (curr != NULL)
     {
         if (filename == curr->fileName)
@@ -79,43 +89,41 @@ void git::addFile(singlyNode * sll)
     //filename was not found
     if (curr == NULL)
     {
-        singlyNode *tmp = new singlyNode;
-        tmp->fileName = filename;
-        tmp->fileVersion = versionHelper(filename, 0); 
-        tmp->next = NULL;
-        prev->next = tmp;
+        singlyNode *add = new singlyNode;
+        add->fileName = filename;
+        add->fileVersion = versionHelper(filename, 0); 
+        add->next = NULL;
+        prev->next = add;
     }
     else //filename was found
     {
-        curr->fileVersion = versionHelper(filename, 1); 
+        cout << "File with that name already exists in the current commit" << endl;
+        return;
     }
 }
 
 
-bool git::removeFile(string filename, doublyNode* tmp)
+bool git::removeFile(string filename)
 {
     //first must check if the file name exists in the singly linked list
-    singlyNode *curr = tmp->head; //wanna access which ever commit we are currently in's head in order to traverse it and see if the file exists in the current version of the repository
+    singlyNode *curr = currCommit->head; //wanna access which ever commit we are currently in's head in order to traverse it and see if the file exists in the current version of the repository
     singlyNode *prev = NULL; //prev set up to help with deletion if the node does exist
-    cout << curr->fileName << endl;
     cout << filename << endl;
-    if(tmp->head->fileName == filename)//deleted the head of the SLL
-            {
-                cout << "deleted" << endl;
-                tmp->head = curr->next; //update the head of the current commit
-                delete curr; //free the memory that was last located at that SLL node
-                curr = NULL; //prevent seg faults
-                return true; //the file has been removed from the commit
-            }
     while(curr != NULL) //may change to curr->next if seg fault
     {
         if(curr->fileName == filename) //its been found then we want to go ahead and delet it from the SLL
         {
-                cout << "ELSE" << endl;
-                prev->next = curr->next; //skip over the file to be deleted in the linked list
-                delete curr;
-                curr = NULL;
-                return true; //the file has been removed from the SLL
+            if(prev == NULL)//deleted the head of the SLL
+            {
+                currCommit->head = currCommit->head->next; //update the head of the current commit
+                delete curr; //free the memory that was last located at that SLL node
+                curr = NULL; //prevent seg faults
+                return true; //the file has been removed from the commit
+            }
+            prev->next = curr->next; //skip over the file to be deleted in the linked list
+            delete curr;
+            curr = NULL;
+            return true; //the file has been removed from the SLL
         }
         prev = curr;
         curr = curr->next;
@@ -196,30 +204,30 @@ void _copyFiles(string fileVersion, int increment) // helper function to copy fi
 }
 
 
-bool git::commitChanges(singlyNode* _sll) // pass in pointer to head of temporary singly list
+bool git::commitChanges() // pass in pointer to head of temporary singly list
 {
     bool isCommitted = false;
-    doublyNode* mostRecentCommit = _findMostRecentCommit(commitHead); // always compare to most recent commit
+    doublyNode* mostRecentCommit = commitTail; // always compare to most recent commit
     int mostRecentCommitNumber = mostRecentCommit->commitNumber; // get most recent commit number
 
-    singlyNode* tempSinglyList = _sll; // traverse through temporary SLL (with nodes that are to be added/have been modified)
+    singlyNode* tempSinglyListTrav = currCommit->head; // traverse through temporary SLL in currentCommit (with nodes that are to be added/have been modified)
     singlyNode* tempSinglyRecentCommit = mostRecentCommit->head; // traverse through most recent commit's SLL
 
 
-    while(_sll != NULL) // traverse through temporary SLL
+    while(tempSinglyListTrav != NULL) // traverse through temporary SLL
     {
-        if(_NotInDirectory(_sll->fileVersion) == true) // if file version does not currently exist in .minigit directory
+        if(_NotInDirectory(tempSinglyListTrav->fileVersion) == true) // if file version does not currently exist in .minigit directory
         {
-            _copyFiles(_sll->fileVersion, 0); // call upon helper function, pass in a 0 means that file version won't be incremented
+            _copyFiles(tempSinglyListTrav->fileVersion, 0); // call upon helper function, pass in a 0 means that file version won't be incremented
         }
 
-        if(_NotInDirectory(_sll->fileVersion) == false) // file version does currently exist in .minigit directory
+        if(_NotInDirectory(tempSinglyListTrav->fileVersion) == false) // file version does currently exist in .minigit directory
         {
             bool isChanged = false;
 
-            string currentVersion = _sll->fileVersion; // not always a txt file!
+            string currentVersion = tempSinglyListTrav->fileVersion; // not always a txt file!
             string gitVersion = ".minigit/" + currentVersion;
-            ifstream CurrentFileVersion(_sll->fileVersion);
+            ifstream CurrentFileVersion(tempSinglyListTrav->fileVersion);
             ifstream gitFileVersion(gitVersion);
 
             char CurrentFileVersionC, gitFileVersionC;
@@ -256,12 +264,12 @@ bool git::commitChanges(singlyNode* _sll) // pass in pointer to head of temporar
 
             if(isChanged == true) // if file versions are different
             {
-                _copyFiles(_sll->fileVersion, 1); // call upon helper function, pass in a 1, which means that version will be incremented
+                _copyFiles(tempSinglyListTrav->fileVersion, 1); // call upon helper function, pass in a 1, which means that version will be incremented
             }
 
             cout << "Files are the same." << endl;
         }
-        _sll = _sll->next;
+        tempSinglyListTrav = tempSinglyListTrav->next;
     }
 
     doublyNode * newCommit = new doublyNode; // create new doublyNode
@@ -327,4 +335,7 @@ git::git() //constructor will create the .minigit folder
  void git::initialize()
  {
     fs::create_directory(".minigit");
+    //initializes a doubly node and the singly node's head point current commit that can be added to and removed from and commited
+    currCommit = new doublyNode;
+    currCommit->commitNumber = -1;
  }
