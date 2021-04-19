@@ -48,21 +48,16 @@ int main(int argc, char* argv[])
             {
                 //creates a new directory
                 mkdir(".minigit", 0777); //returns -1 if the dir isn't created
+                doublyNode* headCommit = new doublyNode;
+                headCommit->commitNumber = 0; 
                 break;
             }
-            
             //add files
             case 2: {
                 //add files
                 mainRepo.addFile(tmp->head);
                 break;
             }
-             //inialize directory 
-              mkdir(".minigit", 0777); //returns -1 if the dir isn't created
-              doublyNode* headCommit = new doublyNode;
-              headCommit->commitNumber = 0;
-            
-            
             //removing files from the commit        
             case 3: {
                 bool found = false;
@@ -78,7 +73,7 @@ int main(int argc, char* argv[])
                         cout << "Leaving the remove. Nothing will be removed from the repository" << endl;
                         break;
                     }
-                    found = mainRepo.removeFile(toRemove); //removeFile will return true if the file name was found and the string name was removed from the list
+                    found = mainRepo.removeFile(toRemove, tmp); //removeFile will return true if the file name was found and the string name was removed from the list
                     if(found == false)
                     {
                         cout << "That file does not exist in the current version of the repository, "

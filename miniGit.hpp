@@ -25,7 +25,7 @@ class git
 {
     public:
         void addFile(singlyNode *sll); // user prompted to pass in file name to be added
-        bool removeFile(string _filename2); // user prompted to pass in file name to be removed
+        bool removeFile(string _filename2, doublyNode* tmp); // user prompted to pass in file name to be removed
         bool commitChanges(singlyNode *_sll); // 
         void checkout(int _commitNumber); // user prompted for commit number, pass into this function
         // add boolean for checkout function, if true then disallow other functions?
