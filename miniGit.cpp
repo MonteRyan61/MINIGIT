@@ -167,9 +167,10 @@ return NotInDirectory;
 }
 
 
-void _copyFiles(string fileVersion, int increment) // helper function to copy files into .minigit directory
+void _copyFiles(string fileVersion, int increment, string filename) // helper function to copy files into .minigit directory
 {
     string addThis = fileVersion; // not always a txt file!
+    cout << addThis << endl;
 
     if(increment == 1) // file version is different
     {
@@ -177,14 +178,13 @@ void _copyFiles(string fileVersion, int increment) // helper function to copy fi
     }
 
     string nowAdding = ".minigit/" + addThis;
-    ifstream addThisFileVersion(addThis);
+    ifstream addThisFileVersion(filename);
     ofstream nowAddingFileVersion(nowAdding);
-
     char addThisFileC;
 
     if(!addThisFileVersion.is_open())
     {
-        cout << "File " << addThis << " to be read failed to open." << endl;
+        cout << "File " << filename << " to be read failed to open." << endl;
         return;
     }
 
@@ -207,22 +207,27 @@ void _copyFiles(string fileVersion, int increment) // helper function to copy fi
 bool git::commitChanges() // pass in pointer to head of temporary singly list
 {
     bool isCommitted = false;
+    int mostRecentCommitNumber = -1;
     doublyNode* mostRecentCommit = commitTail; // always compare to most recent commit
-    int mostRecentCommitNumber = mostRecentCommit->commitNumber; // get most recent commit number
-
+    singlyNode* tempSinglyRecentCommit;
+    if(commitTail != NULL) //do not wanna try and acces mostRecent if their is no most recent like with first commit
+    {
+        mostRecentCommitNumber = mostRecentCommit->commitNumber; // get most recent commit number
+        tempSinglyRecentCommit = mostRecentCommit->head; // traverse through most recent commit's SLL
+    }
     singlyNode* tempSinglyListTrav = currCommit->head; // traverse through temporary SLL in currentCommit (with nodes that are to be added/have been modified)
-    singlyNode* tempSinglyRecentCommit = mostRecentCommit->head; // traverse through most recent commit's SLL
-
 
     while(tempSinglyListTrav != NULL) // traverse through temporary SLL
     {
         if(_NotInDirectory(tempSinglyListTrav->fileVersion) == true) // if file version does not currently exist in .minigit directory
         {
-            _copyFiles(tempSinglyListTrav->fileVersion, 0); // call upon helper function, pass in a 0 means that file version won't be incremented
-        }
+            cout << "DONT EXIST " << endl;
+            _copyFiles(tempSinglyListTrav->fileVersion, 0, tempSinglyListTrav->fileName); // call upon helper function, pass in a 0 means that file version won't be incremented
 
-        if(_NotInDirectory(tempSinglyListTrav->fileVersion) == false) // file version does currently exist in .minigit directory
+        }
+        else if(_NotInDirectory(tempSinglyListTrav->fileVersion) == false) // file version does currently exist in .minigit directory
         {
+            cout << "wat" << endl;
             bool isChanged = false;
 
             string currentVersion = tempSinglyListTrav->fileVersion; // not always a txt file!
@@ -264,21 +269,21 @@ bool git::commitChanges() // pass in pointer to head of temporary singly list
 
             if(isChanged == true) // if file versions are different
             {
-                _copyFiles(tempSinglyListTrav->fileVersion, 1); // call upon helper function, pass in a 1, which means that version will be incremented
+                _copyFiles(tempSinglyListTrav->fileVersion, 1, tempSinglyListTrav->fileName); // call upon helper function, pass in a 1, which means that version will be incremented
             }
 
             cout << "Files are the same." << endl;
         }
         tempSinglyListTrav = tempSinglyListTrav->next;
     }
-
+    cout << "AYY" << endl;
     doublyNode * newCommit = new doublyNode; // create new doublyNode
     newCommit->commitNumber = mostRecentCommit->commitNumber + 1;
     newCommit->previous = mostRecentCommit;
     mostRecentCommit->next = newCommit;
     // newCommit->next = NULL; given in the .hpp file
 
-    // special case for very first commit?
+    // special case for very first commit? yes but sooner
 
     singlyNode* currSinglyNewCommit = newCommit->head; // pointer to traverse through new commit's SLL
 
@@ -328,6 +333,10 @@ void git::checkout(int _commitNumber)
 
 }
 
+git::~git() //destructor need to free all memory
+{
+    fs::remove_all(".minigit");     
+}
 git::git() //constructor will create the .minigit folder
 {   
     fs::remove_all(".minigit");
@@ -338,4 +347,6 @@ git::git() //constructor will create the .minigit folder
     //initializes a doubly node and the singly node's head point current commit that can be added to and removed from and commited
     currCommit = new doublyNode;
     currCommit->commitNumber = -1;
+    commitHead = NULL;
+    commitTail = NULL;
  }

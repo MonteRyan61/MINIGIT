@@ -25,7 +25,7 @@ class git
 {
     public:
         git();
-        // ~git();
+        ~git();
         void initialize();
         void addFile(); // user prompted to pass in file name to be added
         bool removeFile(string _filename2); // user prompted to pass in file name to be removed
