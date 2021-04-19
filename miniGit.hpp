@@ -24,6 +24,9 @@ struct doublyNode
 class git
 {
     public:
+        git();
+        // ~git();
+        void initialize();
         void addFile(singlyNode *sll); // user prompted to pass in file name to be added
         bool removeFile(string _filename2, doublyNode* tmp); // user prompted to pass in file name to be removed
         bool commitChanges(singlyNode *_sll); // 

@@ -4,8 +4,10 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
+#include <filesystem> //added from write up in order to create and delete directories
 
 using namespace std;
+namespace fs = std::filesystem;
 /*
 This function iterates the version type. 
 Variables: 
@@ -317,3 +319,12 @@ void git::checkout(int _commitNumber)
     //maybe use a helper function
 
 }
+
+git::git() //constructor will create the .minigit folder
+{   
+    fs::remove_all(".minigit");
+}
+ void git::initialize()
+ {
+    fs::create_directory(".minigit");
+ }

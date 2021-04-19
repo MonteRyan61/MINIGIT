@@ -14,19 +14,41 @@ using namespace std;
 void menu()
 {
     cout << "---- MENU ----" << endl;
-    cout << "1. Create directory" << endl;
-    cout << "2. Add files to the current commit" << endl;
-    cout << "3. Remove files from the current commit" << endl;
-    cout << "4. Commit the changes" << endl;
-    cout << "5. Check out a specific version based on a unique commit number" << endl;
-    cout << "6. Quit" << endl;
+    cout << "1. Add files to the current commit" << endl;
+    cout << "2. Remove files from the current commit" << endl;
+    cout << "3. Commit the changes" << endl;
+    cout << "4. Check out a specific version based on a unique commit number" << endl;
+    cout << "5. Quit" << endl;
 }
 
 int main(int argc, char* argv[])
 {
     int opt = 0;
-    git mainRepo; //establishing the class git
     int numCommits = 0;
+    git mainRepo; //establishing the class git
+    bool initialized = false;
+    string initialChoice;
+    //only want the repository to be initialized once so can do that here
+    while (initialized == false)
+    {
+        cout << "Would you like to initialize a new repository?" << endl;
+        cout << "Enter Y or N" << endl;
+        getline(cin, initialChoice);
+        if(initialChoice == "Y") //if yes then the .minigit directory will be created
+        {
+            mainRepo.initialize();
+            initialized = true;
+        }
+        else if(initialChoice == "N") //if no they will exit they have no use for the .minigit if they do not want to create a repository
+        {
+            cout << "Quitting..." << endl;
+            return 1;
+        }
+        else
+        {
+            cout << "Invalid option please enter Y to create a new repository and N to exit minigit" << endl;
+        }
+    }
 
     //initializes a doubly node and the singly node's head point
     doublyNode* tmp = new doublyNode;
@@ -34,7 +56,7 @@ int main(int argc, char* argv[])
     singlyNode* head = new singlyNode;
     tmp->head = head;
 
-    while(opt != 6) {
+    while(opt != 5) {
         menu(); //printing menu
 
         //getting user input
@@ -43,23 +65,14 @@ int main(int argc, char* argv[])
         opt = stoi(s);
         
         switch(opt) {
-            //intialize directory
-            case 1: 
-            {
-                //creates a new directory
-                mkdir(".minigit", 0777); //returns -1 if the dir isn't created
-                doublyNode* headCommit = new doublyNode;
-                headCommit->commitNumber = 0; 
-                break;
-            }
             //add files
-            case 2: {
+            case 1: {
                 //add files
                 mainRepo.addFile(tmp->head);
                 break;
             }
             //removing files from the commit        
-            case 3: {
+            case 2: {
                 bool found = false;
                 string toRemove;
                 //cout << "What is the name of the file that you would like to remove from the commit" << endl;
@@ -84,7 +97,7 @@ int main(int argc, char* argv[])
             }
 
             //commit changes
-            case 4: {
+            case 3: {
                 string answer;
                 bool commitSuccess = false; // return true if commit function was successful
                 bool acceptableAnswer = false; // return true if user inputted "yes" or "no"
@@ -129,7 +142,7 @@ int main(int argc, char* argv[])
             }
 
             //check out
-            case 5: {
+            case 4: {
                 string choice;
                 int comnum;
                 cout << "Are you sure that you would like to check out a seperate commit?"
@@ -148,7 +161,7 @@ int main(int argc, char* argv[])
                 break;
             }
 
-            case 6: {
+            case 5: {
                 cout << "Quitting..." << endl;
                 //add warning about losing files
                 break;
