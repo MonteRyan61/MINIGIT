@@ -8,20 +8,46 @@
 
 using namespace std;
 namespace fs = std::filesystem;
+
+git::git() //constructor deletes minigit directory if previously existing
+{   
+    fs::remove_all(".minigit");
+}
+
+git::~git() //destructor needed to free all memory at program's termination
+{
+    fs::remove_all(".minigit");     
+}
+
+ void git::initialize() // function that initalizes a new repo
+ {
+    fs::create_directory(".minigit"); // creates a new directory named ".minigit"
+    currCommit = new doublyNode; // initializes a doubly node
+    currCommit->commitNumber = 0;
+    commitHead = NULL; // the singly node's head and tail point to current commit, which can be added to, and removed from, and committed
+    commitTail = NULL;
+ }
+
+
+// --------------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------------------
+
+
 /*
 This function iterates the version type. 
 Variables: 
     name: name of the file,    
     check: if 1 then file is created, else the file needs to be created
 */
-string versionHelper(string name, int check)
+string versionHelper(string name, int check) // helper function that names the file version and increments the version if needed
 {
     //getting the end of the string .txt, .hpp, or .cpp
     string end = name.substr(name.length()-4, name.length());
     name.erase(name.length()-4, name.length());
     string final;
 
-    if (check == 1)
+    if (check == 1) // passed in as a parameter, means that file version will be incremented
     {
         //getting the iteration of the file
         string num = name.substr(name.length()-2, name.length());
@@ -40,12 +66,13 @@ string versionHelper(string name, int check)
 
     else
     {
-        final = name + "00" + end;
+        final = name + "_00" + end;
     }
     return final;
 }
 
-void git::addFile()
+
+void git::addFile() // function that adds files to the current commit
 {
     bool check = false;
     string filename;
@@ -103,7 +130,12 @@ void git::addFile()
 }
 
 
-bool git::removeFile(string filename)
+// --------------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------------------
+
+
+bool git::removeFile(string filename) // function that removes files from the current commit
 {
     //first must check if the file name exists in the singly linked list
     singlyNode *curr = currCommit->head; //wanna access which ever commit we are currently in's head in order to traverse it and see if the file exists in the current version of the repository
@@ -134,21 +166,9 @@ bool git::removeFile(string filename)
 }
 
 
-
-
-
-
-
-doublyNode* _findMostRecentCommit(doublyNode* &doublyHead) // helper function, always compare to most recent commit
-{
-    doublyNode* pointerToRecentCommit = doublyHead;
-    while(pointerToRecentCommit->next != NULL)
-    {
-        pointerToRecentCommit = pointerToRecentCommit->next;
-    }
-
-return pointerToRecentCommit; // return a pointer to the most recent commit
-}
+// --------------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------------------
 
 
 bool _NotInDirectory(string &singlyFileVersion) // helper function, checks if file version exists in .minigit directory or not
@@ -169,8 +189,8 @@ return NotInDirectory;
 
 void _copyFiles(string fileVersion, int increment, string filename) // helper function to copy files into .minigit directory
 {
-    string addThis = fileVersion; // not always a txt file!
-    cout << addThis << endl;
+    string addThis = fileVersion;
+    cout << "Will be copying this file into .minigit: " << addThis << endl;
 
     if(increment == 1) // file version is different
     {
@@ -207,11 +227,11 @@ void _copyFiles(string fileVersion, int increment, string filename) // helper fu
 bool git::commitChanges() // pass in pointer to head of temporary singly list
 {
     bool isCommitted = false;
-    int mostRecentCommitNumber = -1;
+    int mostRecentCommitNumber = 0;
     doublyNode* mostRecentCommit = commitTail; // always compare to most recent commit
     if(commitTail != NULL)
     {
-        cout << commitTail->commitNumber << endl;
+        cout << "commitTail's commitNumber: " << commitTail->commitNumber << endl;
     }
     singlyNode* tempSinglyRecentCommit;
     if(commitTail != NULL) //do not wanna try and acces mostRecent if their is no most recent like with first commit
@@ -225,13 +245,13 @@ bool git::commitChanges() // pass in pointer to head of temporary singly list
     {
         if(_NotInDirectory(tempSinglyListTrav->fileVersion) == true) // if file version does not currently exist in .minigit directory
         {
-            cout << "DONT EXIST " << endl;
+            cout << "DON'T EXIST" << endl;
             _copyFiles(tempSinglyListTrav->fileVersion, 0, tempSinglyListTrav->fileName); // call upon helper function, pass in a 0 means that file version won't be incremented
 
         }
         else if(_NotInDirectory(tempSinglyListTrav->fileVersion) == false) // file version does currently exist in .minigit directory
         {
-            cout << "Wat" << endl;
+            cout << "FILE EXISTS" << endl;
             bool isChanged = false;
 
             string currentVersion = tempSinglyListTrav->fileVersion; // not always a txt file!
@@ -250,7 +270,7 @@ bool git::commitChanges() // pass in pointer to head of temporary singly list
 
             if(!gitFileVersion.is_open())
             {
-                cout << "File " << gitVersion << " to write into failed to open." << endl;
+                cout << "File " << gitVersion << " to also be read failed to open." << endl;
                 break;
             }
 
@@ -285,24 +305,23 @@ bool git::commitChanges() // pass in pointer to head of temporary singly list
         tempSinglyListTrav = tempSinglyListTrav->next;
     }
 
+
     doublyNode * newCommit = new doublyNode; // create new doublyNode 
     newCommit->commitNumber = mostRecentCommitNumber + 1; //update its commit number
     newCommit->previous = mostRecentCommit;
+    // newCommit->next = NULL; given in the .hpp file
     if(mostRecentCommit != NULL) //prevent seg fault
     {
         cout << "second Commit" << endl;
         mostRecentCommit->next = newCommit; //keep it in the loop
         commitTail = newCommit; //now is the most recent commit
     }
-    else //first commit
+    else // special case for very first commit
     {
         cout << "FIRST COMMIT" << endl;
         commitHead = newCommit;
         commitTail = newCommit;
     }
-    // newCommit->next = NULL; given in the .hpp file
-
-    // special case for very first commit? yes
 
     
     bool headfilled = false;
@@ -333,14 +352,12 @@ bool git::commitChanges() // pass in pointer to head of temporary singly list
     }
 
 
-
-            // add new singly node, with version number that didn't previously exist, to end of newCommit SLL
-// cout << headCommit->commitNumber << endl;
+    // pretty print commit and file versions
     doublyNode* curr = commitHead;
     singlyNode* currsin = NULL;
     while(curr != NULL)
     {
-        cout << curr->commitNumber << endl;
+        cout << "Commit number: " << curr->commitNumber << endl;
         currsin = curr->head;
         while(currsin != NULL)
         {
@@ -348,10 +365,16 @@ bool git::commitChanges() // pass in pointer to head of temporary singly list
             currsin = currsin->next;
         }
         curr = curr->next;
-
     }
+
 return isCommitted;
 }
+
+
+// --------------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------------------------
+
 
 void _copyFiles_checkout(string fileVersion, string filename) // helper function to copy files into .minigit directory
 {
@@ -383,6 +406,7 @@ void _copyFiles_checkout(string fileVersion, string filename) // helper function
     writeToo.close();
     writeFrom.close();
 }
+
 
 void git::checkout()
 {
@@ -490,22 +514,4 @@ void git::checkout()
     }
     //now will be back on most recent commit and can make changes again
     return;
-
 }
-git::~git() //destructor need to free all memory
-{
-    fs::remove_all(".minigit");     
-}
-git::git() //constructor will create the .minigit folder
-{   
-    fs::remove_all(".minigit");
-}
- void git::initialize()
- {
-    fs::create_directory(".minigit");
-    //initializes a doubly node and the singly node's head point current commit that can be added to and removed from and commited
-    currCommit = new doublyNode;
-    currCommit->commitNumber = -1;
-    commitHead = NULL;
-    commitTail = NULL;
- }

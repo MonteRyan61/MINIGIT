@@ -51,6 +51,7 @@ int main(int argc, char* argv[])
     }
 
     while(opt != 5) {
+        cout << endl << endl; // view menu easier in terminal
         menu(); //printing menu
 
         //getting user input
