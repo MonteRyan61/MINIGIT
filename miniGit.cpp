@@ -261,7 +261,7 @@ void git::commitChanges() // pass in pointer to head of temporary singly list
             cout << "FILE EXISTS" << endl;
             bool isChanged = false;
 
-            for(int i = 0;)
+            for
 
             string currentVersion = tempSinglyListTrav->fileVersion; 
             string gitVersion = ".minigit/" + currentVersion;
