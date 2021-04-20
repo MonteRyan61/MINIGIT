@@ -16,7 +16,33 @@ git::git() //constructor deletes minigit directory if previously existing
 
 git::~git() //destructor needed to free all memory at program's termination
 {
-    fs::remove_all(".minigit");     
+    fs::remove_all(".minigit");
+    doublyNode* curr = commitHead;
+    doublyNode* next = NULL;
+    singlyNode* scurr = NULL;
+    singlyNode* snext = NULL;
+    while(curr != NULL)
+    {
+        scurr = curr->head;
+        while(scurr != NULL)
+        {
+            snext = scurr->next;
+            delete scurr;
+            scurr = snext;
+        }
+        next = curr->next;
+        delete curr;
+        curr = next;
+    }
+    scurr = currCommit->head;
+    while(scurr != NULL)
+    {
+        snext = scurr->next;
+        delete scurr;
+        scurr = snext;
+    }
+    delete currCommit;
+    currCommit = NULL;
 }
 
  void git::initialize() // function that initalizes a new repo
@@ -468,27 +494,8 @@ void git::checkout() // function that allows user to visit different commits
 
     while(toreplacewith != NULL) // traverse through temporary SLL and copy to the directory whatever is stored in ther
     {
-            string currentVersion = toreplacewith->fileVersion;
-            string gitVersion = ".minigit/" + currentVersion;
-            ifstream CurrentFileVersion(toreplacewith->fileName);
-            ifstream gitFileVersion(gitVersion);
-
-            char CurrentFileVersionC, gitFileVersionC;
-
-            // check for failures of opening reading streams
-            if(!CurrentFileVersion.is_open())
-            {
-                cout << "File " << toreplacewith->fileName << " to be read failed to open." << endl;
-                break;
-            }
-
-            if(!gitFileVersion.is_open())
-            {
-                cout << "File " << gitVersion << " to also be read failed to open." << endl;
-                break;
-            }
-            _copyFiles_checkout(toreplacewith->fileVersion, toreplacewith->fileName); // call upon helper function, to copy from the .minigit to the current directory
-            toreplacewith = toreplacewith->next;
+        _copyFiles_checkout(toreplacewith->fileVersion, toreplacewith->fileName); // call upon helper function, to copy from the .minigit to the current directory
+        toreplacewith = toreplacewith->next;
     }
     string inp;
     bool correct = false;
@@ -505,27 +512,8 @@ void git::checkout() // function that allows user to visit different commits
     singlyNode* backto = commitTail->head; //want the singly list from the commit we want to check out with which is now the most recent commit to allow user to make changes again
     while(backto != NULL) // traverse through temporary SLL and copy to the directory whatever is stored in ther
     {
-            string currentVersion = backto->fileVersion; // not always a txt file!
-            string gitVersion = ".minigit/" + currentVersion;
-            ifstream CurrentFileVersion(backto->fileName);
-            ifstream gitFileVersion(gitVersion);
-            cout << "IN HERE" << endl;
-            char CurrentFileVersionC, gitFileVersionC;
-
-            // check for failures of opening reading streams
-            if(!CurrentFileVersion.is_open())
-            {
-                cout << "File " << backto->fileName << " to be read failed to open." << endl;
-                break;
-            }
-
-            if(!gitFileVersion.is_open())
-            {
-                cout << "File " << gitVersion << " to also be read failed to open." << endl;
-                break;
-            }
-            _copyFiles_checkout(backto->fileVersion, backto->fileName); // call upon helper function, to copy from the .minigit to the current directory
-            backto = backto->next;
+        _copyFiles_checkout(backto->fileVersion, backto->fileName); // call upon helper function, to copy from the .minigit to the current directory
+        backto = backto->next;
     }
     //now will be back on most recent commit and can make changes again
     return;
