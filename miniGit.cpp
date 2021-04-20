@@ -34,15 +34,19 @@ git::~git() //destructor needed to free all memory at program's termination
         delete curr;
         curr = next;
     }
-    scurr = currCommit->head;
-    while(scurr != NULL)
+     if(currCommit != NULL)
     {
-        snext = scurr->next;
-        delete scurr;
-        scurr = snext;
+        scurr = currCommit->head;
+        while(scurr != NULL)
+        {
+            snext = scurr->next;
+            delete scurr;
+            scurr = snext;
+        }
+        delete currCommit;
+        currCommit = NULL;
     }
-    delete currCommit;
-    currCommit = NULL;
+
 }
 
  void git::initialize() // function that initalizes a new repo
@@ -280,15 +284,32 @@ void git::commitChanges() // pass in pointer to head of temporary singly list
         {
             cout << "DON'T EXIST" << endl;
             _copyFiles(tempSinglyListTrav->fileVersion, 0, tempSinglyListTrav->fileName); // call upon helper function, pass in a 0 means that file version won't be incremented
-
         }
         else if(_NotInDirectory(tempSinglyListTrav->fileVersion) == false) // file version does currently exist in .minigit directory
         {
             cout << "FILE EXISTS" << endl;
             bool isChanged = false;
-
-            string currentVersion = tempSinglyListTrav->fileVersion; 
+            doublyNode* iterate = commitTail;
+            singlyNode* singleIterate =  NULL;
+            string currentVersion;
+            bool oldversionfound = false;
+            while(iterate != NULL && oldversionfound == false)
+            {
+                singleIterate = iterate->head;
+                while(singleIterate != NULL)
+                {
+                    if(singleIterate->fileName == tempSinglyListTrav->fileName)
+                    {
+                       currentVersion = singleIterate->fileVersion;
+                       oldversionfound = true;
+                       break;
+                    }
+                    singleIterate = singleIterate->next;
+                }
+                iterate = iterate->previous;
+            }
             string gitVersion = ".minigit/" + currentVersion;
+            cout << gitVersion << endl;
             ifstream CurrentFileVersion(tempSinglyListTrav->fileName);
             ifstream gitFileVersion(gitVersion); // created reading streams of files
 
@@ -330,8 +351,8 @@ void git::commitChanges() // pass in pointer to head of temporary singly list
 
             if(isChanged == true) // if file versions are different
             {
-                _copyFiles(tempSinglyListTrav->fileVersion, 1, tempSinglyListTrav->fileName); // call upon helper function, pass in a 1, which means that version will be incremented
-                tempSinglyListTrav->fileVersion = versionHelper(tempSinglyListTrav->fileVersion, 1); // wanna update that version number as it has been modified
+                _copyFiles(currentVersion, 1, tempSinglyListTrav->fileName); // call upon helper function, pass in a 1, which means that version will be incremented
+                tempSinglyListTrav->fileVersion = versionHelper(currentVersion, 1); // wanna update that version number as it has been modified
             }
             else
             {
