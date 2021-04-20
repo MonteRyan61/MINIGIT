@@ -204,10 +204,11 @@ void _copyFiles(string fileVersion, int increment, string filename) // helper fu
     }
 
     string nowAdding = ".minigit/" + addThis;
-    ifstream addThisFileVersion(filename);
-    ofstream nowAddingFileVersion(nowAdding);
+    ifstream addThisFileVersion(filename); // created reading stream of file name
+    ofstream nowAddingFileVersion(nowAdding); // created writing stream into .minigit directory
     char addThisFileC;
 
+    // check for failures of opening reading and writing streams
     if(!addThisFileVersion.is_open())
     {
         cout << "File " << filename << " to be read failed to open." << endl;
@@ -226,7 +227,7 @@ void _copyFiles(string fileVersion, int increment, string filename) // helper fu
     }
 
     addThisFileVersion.close();
-    nowAddingFileVersion.close();
+    nowAddingFileVersion.close(); // close streams
 }
 
 
@@ -234,12 +235,13 @@ void git::commitChanges() // pass in pointer to head of temporary singly list
 {
     int mostRecentCommitNumber = 0;
     doublyNode* mostRecentCommit = commitTail; // always compare to most recent commit
+
     if(commitTail != NULL)
     {
         cout << "commitTail's commitNumber: " << commitTail->commitNumber << endl;
     }
     singlyNode* tempSinglyRecentCommit;
-    if(commitTail != NULL) //do not wanna try and acces mostRecent if their is no most recent like with first commit
+    if(commitTail != NULL) //do not wanna try and access mostRecent if there is not most recent commit (like with first commit case)
     {
         mostRecentCommitNumber = mostRecentCommit->commitNumber; // get most recent commit number
         tempSinglyRecentCommit = mostRecentCommit->head; // traverse through most recent commit's SLL
@@ -259,16 +261,16 @@ void git::commitChanges() // pass in pointer to head of temporary singly list
             cout << "FILE EXISTS" << endl;
             bool isChanged = false;
 
-            string currentVersion = tempSinglyListTrav->fileVersion; // not always a txt file!
+            string currentVersion = tempSinglyListTrav->fileVersion; 
             string gitVersion = ".minigit/" + currentVersion;
             ifstream CurrentFileVersion(tempSinglyListTrav->fileName);
-            ifstream gitFileVersion(gitVersion);
+            ifstream gitFileVersion(gitVersion); // created reading streams of files
 
             char CurrentFileVersionC, gitFileVersionC;
 
+            // check for failures of opening reading streams
             if(!CurrentFileVersion.is_open())
             {
-                cout << "RAB" << endl;
                 cout << "File " << tempSinglyListTrav->fileName << " to be read failed to open." << endl;
                 break;
             }
@@ -284,29 +286,33 @@ void git::commitChanges() // pass in pointer to head of temporary singly list
                 CurrentFileVersionC = CurrentFileVersion.get();
                 gitFileVersionC = gitFileVersion.get();
 
-                if(CurrentFileVersionC != gitFileVersionC)
+                if(CurrentFileVersionC != gitFileVersionC) // the moment that a character from both files don't match
                 {
                     cout << "Files are different." << endl;
                     isChanged = true;
                     break;
                 }
 
-                if(CurrentFileVersionC == EOF)
+                if(CurrentFileVersionC == EOF) // if the end of the file to be read is reached
                 {
                     break;
                 }
             }
 
+            CurrentFileVersion.close();
+            gitFileVersion.close(); // close streams
+
             if(isChanged == true) // if file versions are different
             {
                 _copyFiles(tempSinglyListTrav->fileVersion, 1, tempSinglyListTrav->fileName); // call upon helper function, pass in a 1, which means that version will be incremented
-                tempSinglyListTrav->fileVersion = versionHelper(tempSinglyListTrav->fileVersion, 1); //wanna update that version number as it has been modified
+                tempSinglyListTrav->fileVersion = versionHelper(tempSinglyListTrav->fileVersion, 1); // wanna update that version number as it has been modified
             }
             else
             {
                 cout << "Files are the same." << endl;
             }
         }
+
         tempSinglyListTrav = tempSinglyListTrav->next;
     }
 
@@ -383,7 +389,7 @@ return;
 
 void _copyFiles_checkout(string fileVersion, string filename) // helper function to copy files into .minigit directory
 {
-    string addThisToDirectory = fileVersion; // not always a txt file!
+    string addThisToDirectory = fileVersion;
     cout << "copy" << endl;
 
     string nowAdding = ".minigit/" + addThisToDirectory;
@@ -391,6 +397,7 @@ void _copyFiles_checkout(string fileVersion, string filename) // helper function
     ofstream writeToo(filename); //writing to the file name in the directory
     char addThisFileC;
 
+    // check for failures of opening reading and writing streams
     if(!writeToo.is_open())
     {
         cout << "File " << filename << " to be read failed to open." << endl;
@@ -409,11 +416,11 @@ void _copyFiles_checkout(string fileVersion, string filename) // helper function
     }
 
     writeToo.close();
-    writeFrom.close();
+    writeFrom.close(); // close streams
 }
 
 
-void git::checkout()
+void git::checkout() // function that allows user to visit different commits
 {
     int _commitNumber;
     string choice;
@@ -432,11 +439,12 @@ void git::checkout()
     {
         return;
     }
-    else
+    else // check for valid user input
     {
         cout << "Invalid Input" << endl;
         return;
     }
+
     doublyNode* curr = commitHead;
     //first wanna get curr on the node they wanna check out and make sure that that commit number is valid
     if(_commitNumber < 1 || _commitNumber > curr->commitNumber)
@@ -444,7 +452,7 @@ void git::checkout()
         cout << "Invalid commit number to check out with" << endl;
         return;
     }
-    while(curr != NULL) //wanna traverse the list and get onto the commit the user would like to check out
+    while(curr != NULL) // wanna traverse the list and get onto the commit the user would like to check out
     {   
         if(curr->commitNumber == _commitNumber)
         {
@@ -460,13 +468,14 @@ void git::checkout()
 
     while(toreplacewith != NULL) // traverse through temporary SLL and copy to the directory whatever is stored in ther
     {
-            string currentVersion = toreplacewith->fileVersion; // not always a txt file!
+            string currentVersion = toreplacewith->fileVersion;
             string gitVersion = ".minigit/" + currentVersion;
             ifstream CurrentFileVersion(toreplacewith->fileName);
             ifstream gitFileVersion(gitVersion);
 
             char CurrentFileVersionC, gitFileVersionC;
 
+            // check for failures of opening reading streams
             if(!CurrentFileVersion.is_open())
             {
                 cout << "File " << toreplacewith->fileName << " to be read failed to open." << endl;
@@ -475,7 +484,7 @@ void git::checkout()
 
             if(!gitFileVersion.is_open())
             {
-                cout << "File " << gitVersion << " to write into failed to open." << endl;
+                cout << "File " << gitVersion << " to also be read failed to open." << endl;
                 break;
             }
             _copyFiles_checkout(toreplacewith->fileVersion, toreplacewith->fileName); // call upon helper function, to copy from the .minigit to the current directory
@@ -503,6 +512,7 @@ void git::checkout()
             cout << "IN HERE" << endl;
             char CurrentFileVersionC, gitFileVersionC;
 
+            // check for failures of opening reading streams
             if(!CurrentFileVersion.is_open())
             {
                 cout << "File " << backto->fileName << " to be read failed to open." << endl;
@@ -511,7 +521,7 @@ void git::checkout()
 
             if(!gitFileVersion.is_open())
             {
-                cout << "File " << gitVersion << " to write into failed to open." << endl;
+                cout << "File " << gitVersion << " to also be read failed to open." << endl;
                 break;
             }
             _copyFiles_checkout(backto->fileVersion, backto->fileName); // call upon helper function, to copy from the .minigit to the current directory
