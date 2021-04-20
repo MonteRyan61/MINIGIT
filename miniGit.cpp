@@ -209,6 +209,10 @@ bool git::commitChanges() // pass in pointer to head of temporary singly list
     bool isCommitted = false;
     int mostRecentCommitNumber = -1;
     doublyNode* mostRecentCommit = commitTail; // always compare to most recent commit
+    if(commitTail != NULL)
+    {
+        cout << commitTail->commitNumber << endl;
+    }
     singlyNode* tempSinglyRecentCommit;
     if(commitTail != NULL) //do not wanna try and acces mostRecent if their is no most recent like with first commit
     {
@@ -227,19 +231,20 @@ bool git::commitChanges() // pass in pointer to head of temporary singly list
         }
         else if(_NotInDirectory(tempSinglyListTrav->fileVersion) == false) // file version does currently exist in .minigit directory
         {
-            cout << "wat" << endl;
+            cout << "Wat" << endl;
             bool isChanged = false;
 
             string currentVersion = tempSinglyListTrav->fileVersion; // not always a txt file!
             string gitVersion = ".minigit/" + currentVersion;
-            ifstream CurrentFileVersion(tempSinglyListTrav->fileVersion);
+            ifstream CurrentFileVersion(tempSinglyListTrav->fileName);
             ifstream gitFileVersion(gitVersion);
 
             char CurrentFileVersionC, gitFileVersionC;
 
             if(!CurrentFileVersion.is_open())
             {
-                cout << "File " << currentVersion << " to be read failed to open." << endl;
+                cout << "RAB" << endl;
+                cout << "File " << tempSinglyListTrav->fileName << " to be read failed to open." << endl;
                 break;
             }
 
@@ -270,40 +275,81 @@ bool git::commitChanges() // pass in pointer to head of temporary singly list
             if(isChanged == true) // if file versions are different
             {
                 _copyFiles(tempSinglyListTrav->fileVersion, 1, tempSinglyListTrav->fileName); // call upon helper function, pass in a 1, which means that version will be incremented
+                tempSinglyListTrav->fileVersion = versionHelper(tempSinglyListTrav->fileVersion, 1); //wanna update that version number as it has been modified
             }
-
-            cout << "Files are the same." << endl;
+            else
+            {
+                cout << "Files are the same." << endl;
+            }
         }
         tempSinglyListTrav = tempSinglyListTrav->next;
     }
-    cout << "AYY" << endl;
-    doublyNode * newCommit = new doublyNode; // create new doublyNode
-    newCommit->commitNumber = mostRecentCommit->commitNumber + 1;
+
+    doublyNode * newCommit = new doublyNode; // create new doublyNode 
+    newCommit->commitNumber = mostRecentCommitNumber + 1; //update its commit number
     newCommit->previous = mostRecentCommit;
-    mostRecentCommit->next = newCommit;
+    if(mostRecentCommit != NULL) //prevent seg fault
+    {
+        cout << "second Commit" << endl;
+        mostRecentCommit->next = newCommit; //keep it in the loop
+        commitTail = newCommit; //now is the most recent commit
+    }
+    else //first commit
+    {
+        cout << "FIRST COMMIT" << endl;
+        commitHead = newCommit;
+        commitTail = newCommit;
+    }
     // newCommit->next = NULL; given in the .hpp file
 
-    // special case for very first commit? yes but sooner
+    // special case for very first commit? yes
 
-    singlyNode* currSinglyNewCommit = newCommit->head; // pointer to traverse through new commit's SLL
-
-    while(tempSinglyRecentCommit != NULL) // copying most recent commit's SLL to new commit's SLL
+    
+    bool headfilled = false;
+    singlyNode* previousInNew = NULL;
+    singlyNode* traversecopy = currCommit->head;
+    while(traversecopy != NULL) // copying curr commit's SLL to new commit's SLL
     {
         singlyNode* SinglyNodeNewCommit = new singlyNode; // create new singly node to be added to new commit
-        SinglyNodeNewCommit->fileName = tempSinglyRecentCommit->fileName;
-        SinglyNodeNewCommit->fileVersion = tempSinglyRecentCommit->fileVersion;
+        SinglyNodeNewCommit->fileName = traversecopy->fileName; //copy the information over to the newcommit's SLL
+        SinglyNodeNewCommit->fileVersion = traversecopy->fileVersion;
+        if(headfilled == false) //must update the current commits head as first in singly
+        {
+            newCommit->head = SinglyNodeNewCommit;
+            headfilled = true;
+            cout << "head" << endl;
+        }
+        else
+        {
+            //if not the head need to update the pointers
+            cout << "Not Head" << endl;
+            previousInNew->next = SinglyNodeNewCommit;
+            SinglyNodeNewCommit->next = NULL;
+        }
 
-        currSinglyNewCommit = SinglyNodeNewCommit;
-
-        tempSinglyRecentCommit = tempSinglyRecentCommit->next;
-        currSinglyNewCommit = currSinglyNewCommit->next;
+        //continue to traverse currCommits singly
+        previousInNew = SinglyNodeNewCommit;
+        traversecopy = traversecopy->next;
     }
 
 
 
             // add new singly node, with version number that didn't previously exist, to end of newCommit SLL
 // cout << headCommit->commitNumber << endl;
+    doublyNode* curr = commitHead;
+    singlyNode* currsin = NULL;
+    while(curr != NULL)
+    {
+        cout << curr->commitNumber << endl;
+        currsin = curr->head;
+        while(currsin != NULL)
+        {
+            cout << currsin->fileVersion << endl;
+            currsin = currsin->next;
+        }
+        curr = curr->next;
 
+    }
 return isCommitted;
 }
 
