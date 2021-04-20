@@ -66,7 +66,7 @@ string versionHelper(string name, int check) // helper function that names the f
 
     else
     {
-        final = name + "_00" + end;
+        final = name + "00" + end;
     }
     return final;
 }
@@ -82,13 +82,19 @@ void git::addFile() // function that adds files to the current commit
         cout << "Please enter a valid file name: " << endl;
         getline(cin, filename);
 
-        //Check whether the file with the given name exists in the current directory.
-        if (true)
+        ifstream checkValidFilename(filename);
+
+        if(!checkValidFilename.is_open()) // Check whether the file with the given name exists in the current directory.
         {
-            check = true; //needs to be fixed
+            cout << "Invalid file name! Try again." << endl;
+        }
+        else
+        {
+            check = true; /// file name exists in current directory
         }
 
-    } while (check == false); //If not, keep prompting the user to enter a valid file name
+    } while (check == false); // If not, keep prompting the user to enter a valid file name
+
     //Check current commit to see whether the file has already been added. File with same name can't be added twice
     singlyNode *curr = currCommit->head;
     singlyNode *prev = NULL;
@@ -224,9 +230,8 @@ void _copyFiles(string fileVersion, int increment, string filename) // helper fu
 }
 
 
-bool git::commitChanges() // pass in pointer to head of temporary singly list
+void git::commitChanges() // pass in pointer to head of temporary singly list
 {
-    bool isCommitted = false;
     int mostRecentCommitNumber = 0;
     doublyNode* mostRecentCommit = commitTail; // always compare to most recent commit
     if(commitTail != NULL)
@@ -367,7 +372,7 @@ bool git::commitChanges() // pass in pointer to head of temporary singly list
         curr = curr->next;
     }
 
-return isCommitted;
+return;
 }
 
 
@@ -434,8 +439,8 @@ void git::checkout()
     }
     doublyNode* curr = commitHead;
     //first wanna get curr on the node they wanna check out and make sure that that commit number is valid
-    if(_commitNumber < 0) //will have no negative commits
-    {
+    if(_commitNumber < 1 || _commitNumber > curr->commitNumber)
+    { // no negative commits, no commit number 0 (since at commit number 0, file versions don't yet exist in .minigit), no commit number greater than current commit number
         cout << "Invalid commit number to check out with" << endl;
         return;
     }

@@ -57,6 +57,14 @@ int main(int argc, char* argv[])
         //getting user input
         string s;
         getline(cin, s);
+
+        while(int(s[0]) > 53 || int(s[0]) < 49) // check to make sure user inputs number 1 through 5
+        {
+            cout << "Invalid input, please select a valid menu option." << endl << endl;
+            menu();
+            getline(cin, s);
+        }
+
         opt = stoi(s);
         
         switch(opt) {
@@ -94,7 +102,6 @@ int main(int argc, char* argv[])
             //commit changes
             case 3: {
                 string answer;
-                bool commitSuccess = false; // return true if commit function was successful
                 bool acceptableAnswer = false; // return true if user inputted "yes" or "no"
 
                 do
@@ -119,16 +126,7 @@ int main(int argc, char* argv[])
                     if(answer == "yes") // if user would like to commit
                     {
                         acceptableAnswer = true;
-                        commitSuccess = mainRepo.commitChanges(); // call upon commit function
-
-                        if(commitSuccess == true) // if commit was successful
-                        {
-                            cout << "Commit Successful!" << endl;
-                        }
-                        else // if commit was not successful
-                        {
-                            cout << "Commit Failed." << endl;
-                        }
+                        mainRepo.commitChanges(); // call upon commit function
                     }
 
                 } while (acceptableAnswer == false); // if user inputted something besides "yes" or "no"
@@ -149,7 +147,6 @@ int main(int argc, char* argv[])
                 //add warning about losing files
                 break;
             }
-
         }
     }
     cout << "Goodbye!" << endl;
