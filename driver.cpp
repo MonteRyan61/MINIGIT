@@ -139,19 +139,7 @@ int main(int argc, char* argv[])
             case 4: {
                 string choice;
                 int comnum;
-                cout << "Are you sure that you would like to check out a seperate commit?"
-                    " You will lose your local changes if you check out a different version before commiting your local changes" << endl;
-                cout << "Enter Y to continue and N to not" << endl;
-                getline(cin,choice);
-                if(choice == "Y")
-                {
-                    cout << "Which commit number would you like to check out" << endl;
-                    string x;
-                    getline(cin, x);
-                    comnum = stoi(x);
-
-                    mainRepo.checkout(comnum);
-                }
+                mainRepo.checkout();
                 break;
             }
 

@@ -353,8 +353,61 @@ bool git::commitChanges() // pass in pointer to head of temporary singly list
 return isCommitted;
 }
 
-void git::checkout(int _commitNumber)
+void _copyFiles_checkout(string fileVersion, string filename) // helper function to copy files into .minigit directory
 {
+    string addThisToDirectory = fileVersion; // not always a txt file!
+    cout << "copy" << endl;
+
+    string nowAdding = ".minigit/" + addThisToDirectory;
+    ifstream writeFrom(nowAdding); //writing from the .minigit
+    ofstream writeToo(filename); //writing to the file name in the directory
+    char addThisFileC;
+
+    if(!writeToo.is_open())
+    {
+        cout << "File " << filename << " to be read failed to open." << endl;
+        return;
+    }
+
+    if(!writeFrom.is_open())
+    {
+        cout << "File " << nowAdding << " to write into failed to open." << endl;
+        return;
+    }
+
+    while(writeFrom.get(addThisFileC)) // copying to .minigit directory
+    {
+        writeToo << addThisFileC;
+    }
+
+    writeToo.close();
+    writeFrom.close();
+}
+
+void git::checkout()
+{
+    int _commitNumber;
+    string choice;
+    cout << "Are you sure that you would like to check out a seperate commit?"
+    " You will lose your local changes if you check out a different version before commiting your local changes" << endl;
+    cout << "Enter Y to continue and N to not" << endl;
+    getline(cin,choice);
+    if(choice == "Y")
+    {
+        cout << "Which commit number would you like to check out" << endl;
+        string x;
+        getline(cin, x);
+        _commitNumber = stoi(x);
+    }
+    else if(choice == "N")
+    {
+        return;
+    }
+    else
+    {
+        cout << "Invalid Input" << endl;
+        return;
+    }
     doublyNode* curr = commitHead;
     //first wanna get curr on the node they wanna check out and make sure that that commit number is valid
     if(_commitNumber < 0) //will have no negative commits
@@ -374,11 +427,71 @@ void git::checkout(int _commitNumber)
         }
     }
     //now that curr is on the node the user would like to check out we must copy the files over from the repository to the user accesed files
-    //implement a function in which will copy all files to the old string names in the hidden folder to the current directory
-    //maybe use a helper function
+    singlyNode* toreplacewith = curr->head; //want the singly list from the commit we want to check out with
+
+    while(toreplacewith != NULL) // traverse through temporary SLL and copy to the directory whatever is stored in ther
+    {
+            string currentVersion = toreplacewith->fileVersion; // not always a txt file!
+            string gitVersion = ".minigit/" + currentVersion;
+            ifstream CurrentFileVersion(toreplacewith->fileName);
+            ifstream gitFileVersion(gitVersion);
+
+            char CurrentFileVersionC, gitFileVersionC;
+
+            if(!CurrentFileVersion.is_open())
+            {
+                cout << "File " << toreplacewith->fileName << " to be read failed to open." << endl;
+                break;
+            }
+
+            if(!gitFileVersion.is_open())
+            {
+                cout << "File " << gitVersion << " to write into failed to open." << endl;
+                break;
+            }
+            _copyFiles_checkout(toreplacewith->fileVersion, toreplacewith->fileName); // call upon helper function, to copy from the .minigit to the current directory
+            toreplacewith = toreplacewith->next;
+    }
+    string inp;
+    bool correct = false;
+    while(correct == false)
+    {
+        cout << "You are now view and old save in order to add, remove, and commit again Type Y to return to the most current commit" << endl;
+        getline(cin, inp);
+        if(inp == "Y")
+        {
+            correct = true;
+        }
+    }
+    //want to now return them to the most recent commit viewing so they can make changes
+    singlyNode* backto = commitTail->head; //want the singly list from the commit we want to check out with which is now the most recent commit to allow user to make changes again
+    while(backto != NULL) // traverse through temporary SLL and copy to the directory whatever is stored in ther
+    {
+            string currentVersion = backto->fileVersion; // not always a txt file!
+            string gitVersion = ".minigit/" + currentVersion;
+            ifstream CurrentFileVersion(backto->fileName);
+            ifstream gitFileVersion(gitVersion);
+            cout << "IN HERE" << endl;
+            char CurrentFileVersionC, gitFileVersionC;
+
+            if(!CurrentFileVersion.is_open())
+            {
+                cout << "File " << backto->fileName << " to be read failed to open." << endl;
+                break;
+            }
+
+            if(!gitFileVersion.is_open())
+            {
+                cout << "File " << gitVersion << " to write into failed to open." << endl;
+                break;
+            }
+            _copyFiles_checkout(backto->fileVersion, backto->fileName); // call upon helper function, to copy from the .minigit to the current directory
+            backto = backto->next;
+    }
+    //now will be back on most recent commit and can make changes again
+    return;
 
 }
-
 git::~git() //destructor need to free all memory
 {
     fs::remove_all(".minigit");     
