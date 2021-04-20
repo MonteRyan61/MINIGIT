@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
         else if(initialChoice == "N") //if no they will exit they have no use for the .minigit if they do not want to create a repository
         {
             cout << "Quitting..." << endl;
-            return 1;
+            exit(0);
         }
         else
         {
@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
                         acceptableAnswer = true;
                         mainRepo.commitChanges();
                     }
-                    else if(initialChoice == "N") //if no then leave commit changes option
+                    else if(answer == "N") //if no then leave commit changes option
                     {
                         acceptableAnswer = true;
                         cout << "Will not commit files." << endl;
