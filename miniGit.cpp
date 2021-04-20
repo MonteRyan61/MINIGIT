@@ -447,7 +447,7 @@ void git::checkout() // function that allows user to visit different commits
 
     doublyNode* curr = commitHead;
     //first wanna get curr on the node they wanna check out and make sure that that commit number is valid
-    if(_commitNumber < 1 || _commitNumber > curr->commitNumber)
+    if(_commitNumber < 1 || _commitNumber > commitTail->commitNumber)
     { // no negative commits, no commit number 0 (since at commit number 0, file versions don't yet exist in .minigit), no commit number greater than current commit number
         cout << "Invalid commit number to check out with" << endl;
         return;
