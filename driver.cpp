@@ -1,12 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
 #include "miniGit.hpp"
 
 using namespace std;
