@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
         else if(initialChoice == "N") //if no they will exit they have no use for the .minigit if they do not want to create a repository
         {
             cout << "Quitting..." << endl;
-            return 1;
+            exit(0);
         }
         else
         {
@@ -104,32 +104,25 @@ int main(int argc, char* argv[])
                 string answer;
                 bool acceptableAnswer = false; // return true if user inputted "yes" or "no"
 
-                do
+                while(acceptableAnswer == false)
                 {
-                    cout << "Are you sure you'd like to commit your files? (Yes/No)" << endl; // ask user if they're sure they'd like to commit
-                    getline(cin,answer);
-
-                    for(int i = 0; i < answer.size(); i++) // convert the user's input to lowercase letters
+                    cout << "Are you sure you'd like to commit your files? Enter Y or N" << endl;
+                    getline(cin, answer);
+                    if(answer == "Y") // if yes then call upon commit changes function
                     {
-                        if(isupper(answer[i]))
-                        {
-                            answer[i] = tolower(answer[i]);
-                        }
+                        acceptableAnswer = true;
+                        mainRepo.commitChanges();
                     }
-
-                    if(answer == "no") // if user would not like to commit
+                    else if(answer == "N") //if no then leave commit changes option
                     {
                         acceptableAnswer = true;
                         cout << "Will not commit files." << endl;
                     }
-
-                    if(answer == "yes") // if user would like to commit
+                    else // if user inputted something besides "yes" or "no"
                     {
-                        acceptableAnswer = true;
-                        mainRepo.commitChanges(); // call upon commit function
+                        cout << "Invalid option, please enter Y to commit changes." << endl;
                     }
-
-                } while (acceptableAnswer == false); // if user inputted something besides "yes" or "no"
+                }
 
                 break;
             }
@@ -152,4 +145,3 @@ int main(int argc, char* argv[])
     cout << "Goodbye!" << endl;
     return 0;
 }
-
