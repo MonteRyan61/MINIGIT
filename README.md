@@ -1,6 +1,8 @@
 # MINIGIT
 Katherine, Sangati and Ryan will be creating and implementing our own version of git.
 
+This is a local version of Github created from scratch using C++ object-oriented programing to gain a better understanding of Git version control system.
+
 The program compiles with g++-std=c++17, and utilizes the filesystem library.
 
 The core implementation of our version of git is as follows:
